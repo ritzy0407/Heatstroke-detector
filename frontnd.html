@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Heat Stress Assessment</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* Primary accent – warm, friendly orange */
+  --accent:#f59e0b;
+
+  /* Surfaces */
+  --card:#f8fafc;
+  --border:rgba(148,163,184,.6);
+
+  /* Text */
+  --text-main:#0f172a;
+  --text-soft:#475569;
+
+  /* Risk colors (clear & calm) */
+  --low:#22c55e;
+  --mid:#fbbf24;
+  --high:#ef4444;
+}
+
+
+
+*{box-sizing:border-box;font-family:Inter,sans-serif}
+body{
+  margin:0;
+  height:100vh;
+  background:linear-gradient(
+    135deg,
+    #fff7ed 0%,
+    #ffedd5 35%,
+    #e0f2fe 100%
+  );
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:var(--text-main);
+}
+
+.shell{
+width:1200px;height:650px;display:grid;grid-template-columns:1.15fr 1fr;
+border-radius:36px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.6)
+}
+.left{
+  padding:42px;
+  background:linear-gradient(
+    135deg,
+    #fde68a,
+    #fed7aa 55%,
+    #fff7ed
+  );
+}
+
+.badge{
+display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.6);
+padding:6px 14px;border-radius:999px;font-size:.75rem;margin-bottom:18px
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 6px rgba(34,197,94,.35)}
+.left h1{font-size:2.5rem;line-height:1.2;margin-bottom:12px}
+.left p{max-width:420px;font-size:.95rem;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{
+padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.4);
+font-size:.75rem;background:rgba(15,23,42,.35)
+}
+.right{padding:28px;display:flex;justify-content:center;align-items:center}
+.card{
+width:100%;max-width:520px;background:var(--card);border-radius:28px;
+border:1px solid var(--border);padding:26px
+}
+h2{margin:0;font-size:1.15rem}
+.sub{font-size:.8rem;color:var(--text-soft);margin-bottom:10px}
+.units{
+display:flex;align-items:center;gap:16px;font-size:.78rem;
+margin-bottom:14px;white-space:nowrap
+}
+
+/* 🔹 Animated radio labels */
+.unit-label{
+display:flex;align-items:center;gap:4px;
+padding:4px 8px;border-radius:999px;
+transition:all .25s ease;
+cursor:pointer
+}
+.unit-label input{accent-color:var(--accent)}
+.unit-label.active{
+background:rgba(249,115,22,.15);
+box-shadow:0 0 0 1px rgba(249,115,22,.6)
+}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-size:.78rem}
+.req{color:var(--accent)}
+input, select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #94a3b8;
+  background:#ffffff;
+  color:#0f172a;
+  font-size:.9rem;
+}
+
+
+/* 🔹 Greyed optional fields */
+.optional{
+opacity:.45;
+border-color:#374151
+}
+.optional.active{
+opacity:1;
+border-color:rgba(75,85,99,.9)
+}
+
+.divider{
+display:flex;align-items:center;gap:10px;margin:18px 0 8px;font-size:.78rem
+}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#4b5563}
+.divider span{color:#facc15;font-weight:600}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+button{
+  border-radius:999px;
+  padding:10px 22px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  font-size:.85rem;
+}
+
+.clear{
+  background:#e2e8f0;
+  color:#0f172a;
+}
+
+.submit{
+  background:var(--accent);
+  color:#78350f;
+}
+
+.result{
+display:none;margin-top:16px;padding:16px;border-radius:16px;border:1px solid #555
+}
+.bar{
+height:10px;background:linear-gradient(to right,var(--low),var(--mid),var(--high));
+border-radius:999px;position:relative;margin-bottom:8px
+}
+.thumb{
+position:absolute;top:50%;transform:translate(-50%,-50%);
+width:14px;height:14px;border-radius:50%;
+background:#020617;border:2px solid white
+}
+.level{font-size:1.05rem;font-weight:700}
+.advice{font-size:.8rem;color:var(--text-soft);margin-top:6px}
+
+/* ===============================
+   THEME VARIABLES
+================================*/
+
+/* 🌞 Light mode (default) */
+:root{
+  --accent:#f59e0b;
+  --bg-main:#fff7ed;
+  --bg-secondary:#e0f2fe;
+
+  --card:#f8fafc;
+  --border:#cbd5e1;
+
+  --text-main:#0f172a;
+  --text-soft:#475569;
+
+  --low:#22c55e;
+  --mid:#fbbf24;
+  --high:#ef4444;
+}
+
+/* 🌙 Dark mode */
+/* 🌙 Dark mode — soft gray (senior-friendly) */
+body.dark{
+  /* Accent softened */
+  --accent:#fbbf24;
+
+  /* Backgrounds (no pure black) */
+  --bg-main:#1f2933;        /* charcoal gray */
+  --bg-secondary:#2b3440;   /* slate gray */
+
+  /* Surfaces */
+  --card:#2f3947;
+  --border:#475569;
+
+  /* Text */
+  --text-main:#f1f5f9;
+  --text-soft:#cbd5e1;
+
+  /* Risk colors (muted but clear) */
+  --low:#4ade80;
+  --mid:#facc15;
+  --high:#f87171;
+}
+
+
+body{
+  background:linear-gradient(
+    135deg,
+    var(--bg-main),
+    var(--bg-secondary)
+  );
+  color:var(--text-main);
+}
+
+.card{
+  background:var(--card);
+  border-color:var(--border);
+}
+
+/* ===============================
+   THEME TOGGLE SWITCH
+================================*/
+.theme-toggle{
+  position:absolute;
+  top:24px;
+  right:28px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:.75rem;
+  font-weight:600;
+}
+
+.switch{
+  position:relative;
+  width:46px;
+  height:24px;
+}
+
+.switch input{display:none}
+
+.slider{
+  position:absolute;
+  inset:0;
+  background:#cbd5e1;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  height:18px;
+  width:18px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.3s;
+}
+
+body.dark input,
+body.dark select{
+  background:#374151;
+  border-color:#64748b;
+  color:#f8fafc;
+}
+
+body.dark .left{
+  background:linear-gradient(
+    135deg,
+    #374151,
+    #1f2933
+  );
+}
+
+.switch input:checked + .slider{
+  background:#fb923c;
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(22px);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="theme-toggle">
+  <span>🌞</span>
+  <label class="switch">
+    <input type="checkbox" id="themeSwitch">
+    <span class="slider"></span>
+  </label>
+  <span>🌙</span>
+</div>
+
+<div class="shell">
+
+<div class="left">
+<div class="badge"><span class="dot"></span> ML-powered prototype</div>
+<h1>Heat Stroke<br>Detection</h1>
+<p>Estimate heat-stroke risk using environmental and physiological indicators.</p>
+<div class="chips">
+<div class="chip">🌡 Temperature</div>
+<div class="chip">☀ Heat Index</div>
+<div class="chip">🏃 Exercise</div>
+<div class="chip">👤 Age</div>
+<div class="chip">❤️ BP</div>
+</div>
+</div>
+
+<div class="right">
+<div class="card">
+
+<h2>Input Details</h2>
+<div class="sub">Required fields marked *</div>
+
+<div class="units">
+<span>Units:</span>
+<label class="unit-label active">
+<input type="radio" name="unit" value="C" checked> °C
+</label>
+<label class="unit-label">
+<input type="radio" name="unit" value="F"> °F
+</label>
+</div>
+
+<form id="form">
+<div class="grid">
+<div>
+<label>Body Temperature<span class="req">*</span></label>
+<input id="temp" type="number" step="0.1" required>
+</div>
+<div>
+<label>Heat Index<span class="req">*</span></label>
+<input id="hi" type="number" step="0.1" required>
+</div>
+<div>
+<label>Strenuous Exercise<span class="req">*</span></label>
+<select id="exercise" required>
+<option value="">Select</option>
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+<div>
+<label>Age<span class="req">*</span></label>
+<input id="age" type="number" required>
+</div>
+</div>
+
+<div class="divider"><span>Optional clinical features</span></div>
+<div class="sub" style="text-align:center;font-size:.75rem">
+If optional values are not provided, population average values will be used for prediction.
+</div>
+
+<div class="grid">
+<input id="sys_bp" class="optional" placeholder="Systolic BP">
+<input id="dia_bp" class="optional" placeholder="Diastolic BP">
+</div>
+
+<div class="actions">
+<button type="reset" class="clear">Clear</button>
+<button type="submit" class="submit">Submit</button>
+</div>
+</form>
+
+<div id="result" class="result">
+<div class="bar"><div id="thumb" class="thumb"></div></div>
+<div id="level" class="level"></div>
+<div id="advice" class="advice"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+let currentUnit="C";
+const cToF=c=>c*9/5+32;
+const fToC=f=>(f-32)*5/9;
+
+/* 🔹 Animated unit toggle */
+document.querySelectorAll(".unit-label").forEach(label=>{
+label.addEventListener("click",()=>{
+document.querySelectorAll(".unit-label").forEach(l=>l.classList.remove("active"));
+label.classList.add("active");
+});
+});
+
+/* 🔹 Grey optional fields activation */
+["sys_bp","dia_bp"].forEach(id=>{
+const el=document.getElementById(id);
+el.addEventListener("input",()=>{
+el.classList.toggle("active",el.value!=="");
+});
+});
+
+/* 🔹 Safe unit conversion */
+document.querySelectorAll("input[name='unit']").forEach(r=>{
+r.addEventListener("change",e=>{
+if(e.target.value===currentUnit) return;
+["temp","hi"].forEach(id=>{
+const el=document.getElementById(id);
+if(el.value){
+const v=Number(el.value);
+el.value=(e.target.value==="F"?cToF(v):fToC(v)).toFixed(1);
+}
+});
+currentUnit=e.target.value;
+});
+});
+
+/* 🔹 Submit */
+form.addEventListener("submit",async e=>{
+e.preventDefault();
+
+let tempVal=Number(temp.value);
+let hiVal=Number(hi.value);
+if(currentUnit==="F"){
+tempVal=fToC(tempVal);
+hiVal=fToC(hiVal);
+}
+
+const payload={
+body_temp:tempVal,
+heat_index:hiVal,
+exercise:Number(exercise.value),
+age:Number(age.value),
+rectal_temp:tempVal+0.5,
+sys_bp:sys_bp.value||null,
+dia_bp:dia_bp.value||null
+};
+
+result.style.display="block";
+level.textContent="Calculating…";
+
+try{
+const res=await fetch("http://127.0.0.1:5000/predict",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+});
+const data=await res.json();
+const pct=(data.probability*100).toFixed(1);
+thumb.style.left=pct+"%";
+level.textContent=`${data.risk_level} Risk (${pct}%)`;
+advice.textContent=
+data.risk_level==="High"
+?"Immediate cooling required. Seek medical attention."
+:data.risk_level==="Moderate"
+?"Reduce exposure, hydrate, and monitor symptoms."
+:"Low risk. Maintain hydration and avoid extreme heat.";
+}catch{
+level.textContent="Backend not connected";
+advice.textContent="";
+}
+});
+
+const themeSwitch=document.getElementById("themeSwitch");
+
+/* Load saved preference */
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark");
+  themeSwitch.checked=true;
+}
+
+/* Toggle theme */
+themeSwitch.addEventListener("change",()=>{
+  document.body.classList.toggle("dark",themeSwitch.checked);
+  localStorage.setItem(
+    "theme",
+    themeSwitch.checked?"dark":"light"
+  );
+});
+
+</script>
+
+</body>
+</html>
